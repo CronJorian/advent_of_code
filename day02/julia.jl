@@ -1,15 +1,33 @@
+
 function evaluate_round(enemy_choice::String, player_choice::String)::Int
-    p = player_choice == "X" ? 1 : (player_choice == "Y" ? 2 : (player_choice == "Z" ? 3 : 0))
-    e = enemy_choice == "A" ? 1 : (enemy_choice == "B" ? 2 : (enemy_choice == "C" ? 3 : 0))
+    choice_dictionary = Dict(
+        "A" => 1,
+        "B" => 2,
+        "C" => 3,
+        "X" => 1,
+        "Y" => 2,
+        "Z" => 3
+    )
+
+    p = choice_dictionary[player_choice]
+    e = choice_dictionary[enemy_choice]
     g = mod(p - e + 1, 3) * 3 + p
 
     return g
 end
 
 function get_player_choice(enemy_choice::String, wanted_outcome::String)
+    choice_dictionary = Dict(
+        "A" => 1,
+        "B" => 2,
+        "C" => 3,
+        "X" => 2,
+        "Y" => 1,
+        "Z" => 3
+    )
     # wanted_outcome: X := lose, Y := draw, Z := win
-    e = enemy_choice == "A" ? 1 : (enemy_choice == "B" ? 2 : (enemy_choice == "C" ? 3 : 0))
-    w = wanted_outcome == "X" ? 2 : (wanted_outcome == "Y" ? 1 : (wanted_outcome == "Z" ? 3 : 0))
+    e = choice_dictionary[enemy_choice]
+    w = choice_dictionary[wanted_outcome]
 
     return string(Char(mod(e - w, 3)) + 88)
 end
