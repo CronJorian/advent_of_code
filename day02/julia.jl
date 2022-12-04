@@ -32,9 +32,11 @@ function get_player_choice(enemy_choice::String, wanted_outcome::String)
     return string(Char(mod(e - w, 3)) + 88)
 end
 
+
 file = open("./day02/input.txt", "r")
 input = read(file, String)
 close(file)
+
 
 function solution01(input::String)
     plays = split.(split(input, "\n"), " ")
