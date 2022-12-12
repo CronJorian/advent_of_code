@@ -1,34 +1,10 @@
-test_input = raw"""$ cd /
-$ ls
-dir a
-14848514 b.txt
-8504156 c.dat
-dir d
-$ cd a
-$ ls
-dir e
-29116 f
-2557 g
-62596 h.lst
-$ cd e
-$ ls
-584 i
-$ cd ..
-$ cd ..
-$ cd d
-$ ls
-4060174 j
-8033020 d.log
-5626152 d.ext
-7214296 k"""
-
 file = open("./day07/input.txt", "r")
 input = read(file, String)
 close(file)
 
 function change_directory(current_directory, command)
   if command == "/"
-    return ["\\"]
+    return ["/"]
   elseif command == ".."
     return current_directory[:1:length(current_directory)-1]
   else
@@ -42,7 +18,7 @@ end
 
 function build_tree(commands)
   fs = Dict{String,Any}()
-  current_directory = ["\\"]
+  current_directory = ["/"]
   for command in commands
     if command[1] == "\$" && command[2] == "cd"
       current_directory = change_directory(current_directory, command[3])
@@ -61,31 +37,46 @@ function get_size(dict)
     if isa(value, Integer)
       size += value
     else
-      size += get_size(value)  
+      size += get_size(value)
     end
   end
   return size
 end
 
+function walk_directory(dict, current_directory=nothing)
+  fs = Dict{AbstractString,Integer}()
 
-function solution01(input::String)
-  commands = split.(split(test_input, "\n"))
-  build_tree(commands)  
-end
-
-commands = split.(split(test_input, "\n"))
-
-function walk_directory(dict, current_directory)
-  fs = Dict{AbstractString, Integer}()
+  if current_directory !== nothing
+    fs[joinpath(current_directory...)] = get_size(dict)
+  else
+    current_directory = []
+  end
 
   for (key, value) in dict
-    println(joinpath(current_directory..., key))
     if isa(value, Dict)
-      fs[joinpath(current_directory..., key)] = get_size(value)
-      walk_directory(get_nested_value(fs, [current_directory..., key]), [current_directory..., key])
+      merge!(fs, walk_directory(value, [current_directory..., key]))
     end
   end
   return fs
 end
 
-build_tree(commands)
+function solution01(input::String)
+  commands = split.(split(input, "\n"))
+  tree = build_tree(commands)
+  sizes = walk_directory(tree)
+  return sum(filter(size -> size <= 100000, collect(values(sizes))))
+end
+
+function solution02(input::String)
+  available_space = 70000000
+  update_size = 30000000
+
+  commands = split.(split(input, "\n"))
+  tree = build_tree(commands)
+  sizes = walk_directory(tree)
+  required_size = update_size - (available_space - sizes["/"])
+  return minimum(filter(size -> size >= required_size, collect(values(sizes))))
+end
+
+@assert solution01(input) == 1443806
+@assert solution02(input) == 942298
