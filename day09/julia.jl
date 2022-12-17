@@ -11,59 +11,88 @@ D 1
 L 5
 R 2"""
 
-parse_input(input) = map(((direction, steps),) -> (direction, parse(Int, steps)), split.(split(input, "\n")))
+test_input_2 = """R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20"""
 
-function move_head(head_state::Tuple{Int,Int}, direction::AbstractString)::Tuple{Int,Int}
-    x, y = head_state
+mutable struct Knot
+    x::Int
+    y::Int
+    successor::Union{Knot,Nothing}
+    visited_points::Vector{Tuple{Int,Int}}
+end
 
+function pull_knot(knot::Knot, predecessor::Knot)
+    dx, dy = (knot.x - predecessor.x, knot.y - predecessor.y)
+    if !all([-1 <= dx <= 1, -1 <= dy <= 1])
+        knot.x, knot.y = (knot.x - sign(dx), knot.y - sign(dy))
+    end
+
+    push!(knot.visited_points, (knot.x, knot.y))
+
+    if !isnothing(knot.successor)
+        pull_knot(knot.successor, knot)
+    end
+end
+
+function move_knot(knot::Knot, direction::AbstractString)
     if direction == "L"
-        return (x - 1, y)
+        knot.x, knot.y = (knot.x - 1, knot.y)
     elseif direction == "R"
-        return (x + 1, y)
-    elseif direction == "U"
-        return (x, y + 1)
+        knot.x, knot.y = (knot.x + 1, knot.y)
     elseif direction == "D"
-        return (x, y - 1)
+        knot.x, knot.y = (knot.x, knot.y - 1)
+    elseif direction == "U"
+        knot.x, knot.y = (knot.x, knot.y + 1)
+    end
+
+    push!(knot.visited_points, (knot.x, knot.y))
+
+    if !isnothing(knot.successor)
+        pull_knot(knot.successor, knot)
     end
 end
 
-function pull_tail(head_state::Tuple{Int,Int}, tail_state::Tuple{Int,Int})::Tuple{Int,Int}
-    hx, hy = head_state
-    tx, ty = tail_state
-
-    dx, dy = (hx - tx, hy - ty)
-    if -1 <= dx <= 1 && -1 <= dy <= 1
-        return tail_state
-    elseif dx != 0 && dy != 0
-        return (tx + copysign(1, dx), ty + copysign(1, dy))
-    else
-        return (dy == 0 ? tx + copysign(1, dx) : tx, dx == 0 ? ty + copysign(1, dy) : ty)
-    end
+function parse_input(input::String)
+    map(((direction, steps),) -> [direction, parse(Int, steps)], split.(split(input, "\n")))
 end
 
-function move_rope(state::Tuple{Tuple{Int,Int},Tuple{Int,Int}}, direction::AbstractString, steps::Int)
-    head_state, tail_state = state
-    visited_positions = Dict{String,Vector{Tuple{Int,Int}}}("head" => [], "tail" => [])
-
-    for _ in 1:steps
-        head_state = move_head(head_state, direction)
-        push!(visited_positions["head"], head_state)
-        tail_state = pull_tail(head_state, tail_state)
-        push!(visited_positions["tail"], tail_state)
-    end
-    (head_state, tail_state), visited_positions
-end
-
-function solution01(moves)
-    state = ((0, 0), (0, 0))
-    visited_positions = Dict{String,Vector{Tuple{Int,Int}}}("head" => [], "tail" => [])
-
+function move_rope(moves, head)
     for (direction, steps) in moves
-        state, new_positions = move_rope(state, direction, steps)
-        mergewith(append!, visited_positions, new_positions)
+        for _ in 1:steps
+            move_knot(head, direction)
+        end
     end
-    Set(visited_positions["tail"])
+    head
 end
 
-@assert length(solution01(parse_input(test_input))) == 13
-@assert length(solution01(parse_input(input))) == 5683
+function create_rope(num_knots)
+    head = nothing
+    for knot in 1:num_knots
+        head = Knot(0, 0, head, [])
+    end
+
+    head
+end
+
+function solutions(input, num_knots)
+    moves = parse_input(input)
+    head = create_rope(num_knots)
+    tail = move_rope(moves, head)
+    while true
+        if !isnothing(tail.successor)
+            tail = tail.successor
+        else
+            break
+        end
+    end
+    length(Set(tail.visited_points))
+end
+
+solution01 = solutions(input, 2)
+solution02 = solutions(input, 10)
