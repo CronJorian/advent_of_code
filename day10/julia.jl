@@ -9,18 +9,18 @@ end
 function print_solution(crt::AbstractString)
     for cycles in [1:40, 41:80, 81:120, 121:160, 161:200, 201:239]
         println(crt[cycles])
-    end    
+    end
 end
 
 function solution01(input::AbstractString)
-    register = Dict{Integer, Integer}() # Cycle, register
+    register = Dict{Integer,Integer}() # Cycle, register
     X = 1
     cycle = 0.5 # 0.5 means between cycle 0 and 1
     next_important_cycle = 20
     accumulator = 0
 
     for (command, value) in parse_input(input)
-        if cycle > next_important_cycle isnothing(get(register, next_important_cycle, nothing))
+        if cycle > next_important_cycle && isnothing(get(register, next_important_cycle, nothing))
             register[next_important_cycle] = X
             next_important_cycle += 40
         end
@@ -34,7 +34,7 @@ function solution01(input::AbstractString)
             accumulator = value
         end
     end
-    sum(map(((x,y),) -> x*y, collect(register)))
+    sum(map(((x, y),) -> x * y, collect(register)))
 end
 
 function solution02(input::AbstractString)
@@ -42,7 +42,7 @@ function solution02(input::AbstractString)
     pixels = ""
     middle_position = 2
     accumulator = 0
-    
+
     for (command, value) in parse_input(input)
         for step in mod.((length(pixels)+1):cycle, 40)
             pixels *= in(step, middle_position-1:middle_position+1) ? "#" : "."
