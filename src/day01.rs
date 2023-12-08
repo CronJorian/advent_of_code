@@ -1,13 +1,8 @@
-use std::fs;
+use super::util;
 
 pub fn run() {
     task01();
     task02();
-}
-
-fn read_file(path: String) -> String {
-    let content = fs::read_to_string(path).expect("Should have been able to read the file");
-    return content;
 }
 
 fn find_first_digit(text: &str, reverse: bool) -> Option<u32> {
@@ -26,8 +21,8 @@ fn find_first_digit(text: &str, reverse: bool) -> Option<u32> {
     None
 }
 
-pub fn task01() {
-    let content = read_file("./inputs/day01.txt".to_string());
+fn task01() {
+    let content = util::read_file("./inputs/day01.txt".to_string());
     let mut buffer: Vec<u32> = Vec::new();
 
     for line in content.lines() {
@@ -43,7 +38,7 @@ pub fn task01() {
 }
 
 fn task02() {
-    let content = read_file("./inputs/day01.txt".to_string());
+    let content = util::read_file("./inputs/day01.txt".to_string());
     let mut buffer: Vec<u32> = Vec::new();
 
     for line in content.lines() {
@@ -54,8 +49,8 @@ fn task02() {
             match digit {
                 Some(x) => line_buffer.push(x),
                 None => {
-                    if i+3 <= line.len() {   
-                        for j in i+3..=line.len().min(i+5) {
+                    if i + 3 <= line.len() {
+                        for j in i + 3..=line.len().min(i + 5) {
                             let word = &line[i..j];
                             match to_numeric(word) {
                                 Some(y) => line_buffer.push(y),

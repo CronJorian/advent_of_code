@@ -1,6 +1,7 @@
 use std::env;
 
 mod day01;
+mod util;
 
 fn main() {
     for arg in env::args().skip(1) {
