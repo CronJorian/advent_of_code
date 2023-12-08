@@ -22,7 +22,7 @@ fn find_first_digit(text: &str, reverse: bool) -> Option<u32> {
 }
 
 fn task01() {
-    let content = util::read_file("./inputs/day01.txt".to_string());
+    let content = util::read_file("./inputs/day01.txt");
     let mut buffer: Vec<u32> = Vec::new();
 
     for line in content.lines() {
@@ -38,7 +38,7 @@ fn task01() {
 }
 
 fn task02() {
-    let content = util::read_file("./inputs/day01.txt".to_string());
+    let content = util::read_file("./inputs/day01.txt");
     let mut buffer: Vec<u32> = Vec::new();
 
     for line in content.lines() {
