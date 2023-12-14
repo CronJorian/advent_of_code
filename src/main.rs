@@ -3,6 +3,7 @@ use std::env;
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod util;
 
 fn main() {
@@ -11,6 +12,7 @@ fn main() {
             "day01" => day01::run(),
             "day02" => day02::run(),
             "day03" => day03::run(),
+            "day04" => day04::run(),
             _ => println!("Exercise \"{arg}\" not found")
         }
     }
