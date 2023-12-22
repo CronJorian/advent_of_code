@@ -6,6 +6,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
+mod day07;
 mod util;
 
 fn main() {
@@ -17,6 +18,7 @@ fn main() {
             "day04" => day04::run(),
             "day05" => day05::run(),
             "day06" => day06::run(),
+            "day07" => day07::run(),
             _ => println!("Exercise \"{arg}\" not found")
         }
     }
